@@ -1,5 +1,6 @@
 # Fraud-Detection Dashboard
 Fraud Detection Data Engineering Project
 
-<image-card alt="Plot" src="images/2.png" ></image-card>
-<image-card alt="Dashboard" src="images/4.png" ></image-card>
+<img src="images/2.png" alt="Dashboarding" width="300" />
+<img src="images/4.png" alt="Dashboarding2" width="300" />
+
