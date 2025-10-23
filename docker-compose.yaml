@@ -1,0 +1,134 @@
+services:
+  zookeeper:
+    image: debezium/zookeeper:3.0.0.Final
+    container_name: zookeeper
+    ports:
+      - 2181:2181
+    networks:
+      - my-network
+
+  kafka:
+    image: debezium/kafka:3.0.0.Final
+    container_name: kafka
+    ports:
+      - 9092:9092
+    networks:
+      - my-network
+    environment:
+      - ZOOKEEPER_CONNECT=zookeeper:2181
+
+  mysql:
+    image: debezium/example-mysql:3.0.0.Final
+    container_name: mysql
+    ports:
+      - 3306:3306
+    networks:
+      - my-network
+    environment:
+      - MYSQL_ROOT_PASSWORD=debezium
+      - MYSQL_USER=mysqluser
+      - MYSQL_PASSWORD=mysqlpw
+
+  postgres:
+    image: debezium/postgres:16
+    container_name: postgres
+    networks:
+      - my-network
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456 
+    ports:
+      - "6543:5432"   
+      
+  connect:
+    image: debezium/connect:3.0.0.Final
+    container_name: connect
+    ports:
+      - 8083:8083
+    networks:
+      - my-network
+    environment:
+      - BOOTSTRAP_SERVERS=kafka:9092
+      - GROUP_ID=1
+      - CONFIG_STORAGE_TOPIC=my_connect_configs
+      - OFFSET_STORAGE_TOPIC=my_connect_offsets
+      - STATUS_STORAGE_TOPIC=my_connect_statuses
+
+  kafka-ui:
+    container_name: kafka-ui
+    image: docker.arvancloud.ir/provectuslabs/kafka-ui:v0.7.2
+    ports:
+      - 9090:8080 
+    depends_on:
+      - kafka
+      - connect
+      # - schema-registry
+    networks:
+      - my-network
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: 'kafka:9092'
+      KAFKA_CLUSTERS_0_KAFKACONNECT_0_NAME: connect
+      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schema-registry:8081
+      KAFKA_CLUSTERS_0_KAFKACONNECT_0_ADDRESS: http://connect:8083
+      DYNAMIC_CONFIG_ENABLED: 'true'
+
+  # schema-registry:
+  #   container_name: schema-registry
+  #   image: confluentinc/cp-schema-registry:7.5.1
+  #   hostname: schema-registry
+  #   ports:
+  #     - "8081:8081"
+  #   networks:
+  #     - my-network
+  #   environment:
+  #     SCHEMA_REGISTRY_HOST_NAME: schema-registry
+  #     SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka:9092'
+  #     SCHEMA_REGISTRY_LISTENERS: 'http://0.0.0.0:8081'
+  #   depends_on:
+  #     - kafka   
+
+  spark:
+    image: apache/spark:3.5.4
+    container_name: spark
+    networks:
+      - my-network
+    ports:
+      - "8080:8080" 
+      - "7077:7077"
+    environment:
+      - SPARK_MODE=master
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
+
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:11.4.0
+    ports:
+      - "3000:3000"
+    networks:
+      - my-network
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin123 
+      - GF_USERS_ALLOW_SIGN_UP=false 
+    volumes:
+      - ./grafana-storage:/var/lib/grafana     
+
+
+  redis:
+    image: redis:7.4.1
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - my-network
+     
+
+networks:
+  my-network:
+    driver: bridge
+
+volumes:
+  grafana-storage:
