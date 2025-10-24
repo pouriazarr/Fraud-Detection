@@ -1,5 +1,6 @@
 # Fraud-Detection Dashboard
 Fraud Detection Data Engineering Project :
+Detecting Fraud in Shopping Centers and Tracking Sellers
 
 <div style="text-align: center;">
   <img src="images/2.png" alt="Dashboarding" style="max-width: 100%; height: auto;" />
