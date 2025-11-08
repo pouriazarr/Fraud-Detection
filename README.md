@@ -10,7 +10,7 @@ Detecting Fraud in Shopping Centers and Tracking Sellers Using **Apache Spark, A
 - Debezium images used in Docker Compose for CDC (Change Data Capture)
 - PostgreSQL and MySQL as Databases for transactional data (Data Source Layer)
 - Kafka as a Message Broker and to store processed data for notification jobs (Data Ingestion Layer)
-- Spark as a Processing/Transformation Unit (Data Processing Layer)
+- Spark as a Processing/Transformation Unit , micro-batch Structured Streaming (Data Processing Layer)
 - Redis as a super-fast storage for real-time communication with Grafana
 - Grafana for Monitoring Tasks and Dashboarding
 
